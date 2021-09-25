@@ -23,6 +23,8 @@ schemaString='f1 f2 Date f4 f5 f6 f7 f8 f9 f10 f11 f12 f13 Region Country'
 fields = [StructField(field_name, StringType(), True) for field_name in schemaString.split()]
 schema = StructType(fields)
 
+
+
 df = spark.createDataFrame(pdf, schema)
 
 #Modifying Schema type for compuational purpose
@@ -30,8 +32,10 @@ df0 = df.withColumn('Temperature',df['f8'].cast(IntegerType())).withColumn('Wind
 
 #Selecting hot temperature based on Maximum Screen Temerature and Minimun Wind Speed
 df_region = df0.groupby('Region','Country','Date').agg(max('Temperature').alias('Temperature'), min('WindSpeed').alias('WindSpeed')).orderBy(col('Temperature').desc())
-df_exact= df_region.filter(df_region.WindSpeed > 0).collect()[0]
+df_exact= df_region.filter(df_region.WindSpeed > 0)
+df_result = df_exact.first()
+
 #Writing the output in parquet file
-df_exact.wirte.parquet("C://Users//Harsha//Documents//Testing//Input//result.parquet")
+df_result.write.parquet("C://Users//Harsha//Documents//Testing//Input//result.parquet")
 
 sc.stop()
